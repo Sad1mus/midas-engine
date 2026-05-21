@@ -210,9 +210,7 @@ def _project_ontology_rule(
     if op == "create":
         action = payload["action"]
         if action not in ("veto", "size_down"):
-            raise ValueError(
-                f"ontology rule action must restrict (veto|size_down), got {action!r}"
-            )
+            raise ValueError(f"ontology rule action must restrict (veto|size_down), got {action!r}")
         conn.execute(
             """
             INSERT OR REPLACE INTO ontology_rules

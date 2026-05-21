@@ -130,8 +130,7 @@ def _ensure_schema(conn: sqlite3.Connection) -> None:
         """
     )
     conn.execute(
-        "CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts "
-        "USING fts5(path UNINDEXED, title, tags, body)"
+        "CREATE VIRTUAL TABLE IF NOT EXISTS notes_fts USING fts5(path UNINDEXED, title, tags, body)"
     )
 
 

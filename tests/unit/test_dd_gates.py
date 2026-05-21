@@ -68,15 +68,19 @@ def test_drawdown_ladder_trips_and_writes_chain(tmp_db: Path, tmp_path: Path) ->
 
     expected = [
         (100_000, "normal", 1.0, False),
-        (94_000, "dd5", 0.5, True),   # -6%
+        (94_000, "dd5", 0.5, True),  # -6%
         (89_000, "dd10", 0.25, True),  # -11%
         (84_000, "dd15", 0.125, True),  # -16%
-        (79_000, "halt", 0.0, True),   # -21%
+        (79_000, "halt", 0.0, True),  # -21%
     ]
     for i, (equity, level, mult, should_trip) in enumerate(expected):
         _insert_equity(conn, equity, ts_ms=1_000 + i)
-        g = gates.evaluate_gate(conn, track="agg", chain_path=chain_path, ts=dt.datetime(
-            2026, 1, 1, 0, 0, i, tzinfo=dt.UTC))
+        g = gates.evaluate_gate(
+            conn,
+            track="agg",
+            chain_path=chain_path,
+            ts=dt.datetime(2026, 1, 1, 0, 0, i, tzinfo=dt.UTC),
+        )
         assert g.level == level, f"equity {equity} → esperaba {level}, fue {g.level}"
         assert g.sizing_mult == mult
         assert g.tripped is should_trip
@@ -102,7 +106,9 @@ def test_drawdown_ladder_trips_and_writes_chain(tmp_db: Path, tmp_path: Path) ->
 # ── integración con el Risk Manager ─────────────────────────────────────
 
 
-def test_manager_halt_gate_rejects(make_signal: Signal, make_state: State, kill: KillSwitch) -> None:
+def test_manager_halt_gate_rejects(
+    make_signal: Signal, make_state: State, kill: KillSwitch
+) -> None:
     halt = GateState(level="halt", sizing_mult=0.0, drawdown_pct=0.21)
     decision = manager.evaluate(make_signal(), make_state(), kill_switch=kill, gate=halt)
     assert decision.verdict == RiskVerdict.REJECT
@@ -110,7 +116,9 @@ def test_manager_halt_gate_rejects(make_signal: Signal, make_state: State, kill:
     assert any("HALT" in r for r in decision.reasons)
 
 
-def test_manager_gate_reduces_size(make_signal: Signal, make_state: State, kill: KillSwitch) -> None:
+def test_manager_gate_reduces_size(
+    make_signal: Signal, make_state: State, kill: KillSwitch
+) -> None:
     # sin gate: aprueba 2 contratos (caso base conocido)
     base = manager.evaluate(make_signal(), make_state(), kill_switch=kill)
     assert base.approved_size_contracts == 2

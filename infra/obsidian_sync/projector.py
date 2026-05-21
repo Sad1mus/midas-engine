@@ -30,20 +30,55 @@ RECENT_LIMIT = 50
 # Secciones del dashboard: (título, carpeta FROM, type_filter|None, [campos], sort|None, limit|None).
 # Esta spec ALIMENTA las queries Dataview y la verificación del test (quedan en sync).
 DASHBOARD_SECTIONS: list[tuple[str, str, str | None, list[str], str | None, int | None]] = [
-    ("🛡️ DD-gate (estado)", GENERATED_DIR, "cockpit-equity",
-     ["gate_level", "sizing_mult", "current_dd_pct"], None, None),
-    ("💰 Equity / PnL", GENERATED_DIR, "cockpit-equity",
-     ["equity", "peak_equity", "drawdown_pct", "realized_pnl"], None, None),
-    ("📈 Trades recientes", f"{GENERATED_DIR}/trades", "cockpit-trade",
-     ["instrument", "side", "status", "vetoed"], "ts DESC", 20),
-    ("🧪 Sleeves — veredicto GO/NO-GO", f"{GENERATED_DIR}/sleeves", "cockpit-sleeve",
-     ["verdict", "dsr", "pbo", "max_dd_pct"], "pbo ASC", None),
-    ("🌀 Regímenes 𝒳 recientes", f"{GENERATED_DIR}/regimes", "cockpit-regime",
-     ["regime", "d_topo", "ts"], "ts DESC", 10),
-    ("⚖️ Reglas de Magister activas", f"{GENERATED_DIR}/ontology", "cockpit-rule",
-     ["action", "instrument", "rule_type"], None, None),
-    ("📜 Decisiones (DEC) recientes", "10_Decisions", None,
-     ["status", "title"], "id DESC", 10),
+    (
+        "🛡️ DD-gate (estado)",
+        GENERATED_DIR,
+        "cockpit-equity",
+        ["gate_level", "sizing_mult", "current_dd_pct"],
+        None,
+        None,
+    ),
+    (
+        "💰 Equity / PnL",
+        GENERATED_DIR,
+        "cockpit-equity",
+        ["equity", "peak_equity", "drawdown_pct", "realized_pnl"],
+        None,
+        None,
+    ),
+    (
+        "📈 Trades recientes",
+        f"{GENERATED_DIR}/trades",
+        "cockpit-trade",
+        ["instrument", "side", "status", "vetoed"],
+        "ts DESC",
+        20,
+    ),
+    (
+        "🧪 Sleeves — veredicto GO/NO-GO",
+        f"{GENERATED_DIR}/sleeves",
+        "cockpit-sleeve",
+        ["verdict", "dsr", "pbo", "max_dd_pct"],
+        "pbo ASC",
+        None,
+    ),
+    (
+        "🌀 Regímenes 𝒳 recientes",
+        f"{GENERATED_DIR}/regimes",
+        "cockpit-regime",
+        ["regime", "d_topo", "ts"],
+        "ts DESC",
+        10,
+    ),
+    (
+        "⚖️ Reglas de Magister activas",
+        f"{GENERATED_DIR}/ontology",
+        "cockpit-rule",
+        ["action", "instrument", "rule_type"],
+        None,
+        None,
+    ),
+    ("📜 Decisiones (DEC) recientes", "10_Decisions", None, ["status", "title"], "id DESC", 10),
 ]
 
 GENERATED_WARNING = (
@@ -174,9 +209,7 @@ def _project_equity(conn: sqlite3.Connection, gen: Path, summary: ProjectionSumm
 
 
 def _project_sleeves(conn: sqlite3.Connection, gen: Path, summary: ProjectionSummary) -> None:
-    ids = {
-        r[0] for r in conn.execute("SELECT id FROM sleeves").fetchall()
-    } | {
+    ids = {r[0] for r in conn.execute("SELECT id FROM sleeves").fetchall()} | {
         r[0] for r in conn.execute("SELECT DISTINCT sleeve_id FROM backtest_results").fetchall()
     }
     n = 0
@@ -186,7 +219,8 @@ def _project_sleeves(conn: sqlite3.Connection, gen: Path, summary: ProjectionSum
         ).fetchone()
         bt = conn.execute(
             "SELECT ts_utc, dsr, pbo, max_dd_pct, n_paths, sharpe_mean, embargo_pct, purge_pct "
-            "FROM backtest_results WHERE sleeve_id = ? ORDER BY id DESC LIMIT 1", (sid,)
+            "FROM backtest_results WHERE sleeve_id = ? ORDER BY id DESC LIMIT 1",
+            (sid,),
         ).fetchone()
         dsr = float(bt["dsr"]) if bt else None
         pbo = float(bt["pbo"]) if bt else None
@@ -223,7 +257,8 @@ def _project_sleeves(conn: sqlite3.Connection, gen: Path, summary: ProjectionSum
 def _project_regimes(conn: sqlite3.Connection, gen: Path, summary: ProjectionSummary) -> None:
     rows = conn.execute(
         "SELECT id, ts_utc, classifier, regime_label, features_json "
-        "FROM regime_states ORDER BY ts_ms DESC LIMIT ?", (RECENT_LIMIT,)
+        "FROM regime_states ORDER BY ts_ms DESC LIMIT ?",
+        (RECENT_LIMIT,),
     ).fetchall()
     n = 0
     for r in rows:
@@ -245,7 +280,8 @@ def _project_regimes(conn: sqlite3.Connection, gen: Path, summary: ProjectionSum
 def _project_trades(conn: sqlite3.Connection, gen: Path, summary: ProjectionSummary) -> None:
     rows = conn.execute(
         "SELECT id, ts_signal_utc, instrument, side, size_target, status, veto_reason "
-        "FROM trades ORDER BY ts_signal_ms DESC LIMIT ?", (RECENT_LIMIT,)
+        "FROM trades ORDER BY ts_signal_ms DESC LIMIT ?",
+        (RECENT_LIMIT,),
     ).fetchall()
     n = 0
     for r in rows:
@@ -296,7 +332,7 @@ def _project_ontology(conn: sqlite3.Connection, gen: Path, summary: ProjectionSu
 def _dataview_block(
     folder: str, type_filter: str | None, fields: list[str], sort: str | None, limit: int | None
 ) -> str:
-    q = f"TABLE {', '.join(fields)}\nFROM \"{folder}\""
+    q = f'TABLE {", ".join(fields)}\nFROM "{folder}"'
     if type_filter:
         q += f'\nWHERE type = "{type_filter}"'
     if sort:

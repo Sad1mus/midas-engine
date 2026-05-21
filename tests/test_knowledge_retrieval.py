@@ -12,7 +12,9 @@ if str(REPO_ROOT) not in sys.path:
 from core.knowledge import retrieval  # noqa: E402
 
 
-def _write_note(vault: Path, rel: str, *, title: str, body: str, tags: str = "", extra: str = "") -> None:
+def _write_note(
+    vault: Path, rel: str, *, title: str, body: str, tags: str = "", extra: str = ""
+) -> None:
     path = vault / rel
     path.parent.mkdir(parents=True, exist_ok=True)
     front = f"---\ntitle: {title}\n"
@@ -61,12 +63,16 @@ def test_structure_boost_instrument(tmp_path: Path) -> None:
     db = tmp_path / "knowledge.db"
 
     _write_note(
-        vault, "20_Sleeves/a.md", title="Setup A",
+        vault,
+        "20_Sleeves/a.md",
+        title="Setup A",
         body="breakout setup with strong momentum and volume.",
         extra="instrument: ES",
     )
     _write_note(
-        vault, "20_Sleeves/b.md", title="Setup B",
+        vault,
+        "20_Sleeves/b.md",
+        title="Setup B",
         body="breakout setup with strong momentum and volume.",
         extra="instrument: NQ",
     )
@@ -83,13 +89,17 @@ def test_graph_neighbor_boost(tmp_path: Path) -> None:
     db = tmp_path / "knowledge.db"
 
     _write_note(
-        vault, "10_Decisions/DEC-100_main.md", title="Main",
+        vault,
+        "10_Decisions/DEC-100_main.md",
+        title="Main",
         body="topic alpha discussion linking to context.",
         extra="id: DEC-100",
     )
     # nota vecina enlazada desde la principal; comparte el término 'alpha' débilmente
     _write_note(
-        vault, "10_Decisions/DEC-101_ctx.md", title="Context",
+        vault,
+        "10_Decisions/DEC-101_ctx.md",
+        title="Context",
         body="alpha context note. See [[DEC-100]] for the main rationale.",
         extra="id: DEC-101",
     )

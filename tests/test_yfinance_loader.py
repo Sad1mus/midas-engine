@@ -50,8 +50,13 @@ def test_refresh_calls_download_and_writes_cache(
         calls["n"] += 1
         idx = pd.date_range("2024-01-01", periods=5, freq="D")
         return pd.DataFrame(
-            {"Open": [1, 2, 3, 4, 5], "High": [2, 3, 4, 5, 6], "Low": [0.5, 1, 2, 3, 4],
-             "Close": [1.5, 2.5, 3.5, 4.5, 5.5], "Volume": [10, 20, 30, 40, 50]},
+            {
+                "Open": [1, 2, 3, 4, 5],
+                "High": [2, 3, 4, 5, 6],
+                "Low": [0.5, 1, 2, 3, 4],
+                "Close": [1.5, 2.5, 3.5, 4.5, 5.5],
+                "Volume": [10, 20, 30, 40, 50],
+            },
             index=idx,
         )
 
@@ -74,8 +79,14 @@ def test_missing_cache_triggers_download(monkeypatch: pytest.MonkeyPatch, tmp_pa
         called["n"] += 1
         idx = pd.date_range("2024-02-01", periods=3, freq="D")
         return pd.DataFrame(
-            {"Open": [1, 2, 3], "High": [2, 3, 4], "Low": [0.5, 1, 2],
-             "Close": [1.5, 2.5, 3.5], "Volume": [10, 20, 30]}, index=idx,
+            {
+                "Open": [1, 2, 3],
+                "High": [2, 3, 4],
+                "Low": [0.5, 1, 2],
+                "Close": [1.5, 2.5, 3.5],
+                "Volume": [10, 20, 30],
+            },
+            index=idx,
         )
 
     monkeypatch.setattr(yl, "_download", fake_download)

@@ -26,7 +26,9 @@ def test_projector_does_not_import_core_risk() -> None:
     result = subprocess.run(
         [sys.executable, "-c", code], cwd=REPO_ROOT, capture_output=True, text=True, check=False
     )
-    assert result.returncode == 0, f"el projector arrastró core.risk: {result.stdout}{result.stderr}"
+    assert result.returncode == 0, (
+        f"el projector arrastró core.risk: {result.stdout}{result.stderr}"
+    )
     assert "OK" in result.stdout
 
 

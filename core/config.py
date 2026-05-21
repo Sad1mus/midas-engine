@@ -4,6 +4,7 @@ Sin `pydantic-settings` a propósito: el stack Fase 1 (DEC-001) está bajo lockd
 y esa dependencia no está en la lista. Usamos pydantic puro + un loader explícito
 desde os.environ. Todo el sistema importa `settings` desde aquí.
 """
+
 from __future__ import annotations
 
 import os
@@ -16,9 +17,9 @@ from pydantic import BaseModel
 class SystemMode(StrEnum):
     """Modo de ejecución — determina latencia tolerable y restricciones de compliance."""
 
-    A_AI_DRIVEN = "A"      # Zenithstone live propio. Sub-segundo. Sin restricciones.
-    B_AI_ASSISTED = "B"    # Apex / Track A. Humano confirma <5s.
-    C_LOCAL_ONLY = "C"     # TopStep. PC física local.
+    A_AI_DRIVEN = "A"  # Zenithstone live propio. Sub-segundo. Sin restricciones.
+    B_AI_ASSISTED = "B"  # Apex / Track A. Humano confirma <5s.
+    C_LOCAL_ONLY = "C"  # TopStep. PC física local.
 
 
 def _env_str(key: str, default: str) -> str:

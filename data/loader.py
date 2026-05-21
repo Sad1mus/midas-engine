@@ -69,9 +69,7 @@ def normalize_ohlcv(df: pd.DataFrame, *, timestamp_col: str | None = None) -> pd
             df.index.tz_localize("UTC") if df.index.tz is None else df.index.tz_convert("UTC")
         )
     else:
-        raise OHLCVError(
-            "no se encontró columna de tiempo (timestamp/date/...) ni DatetimeIndex"
-        )
+        raise OHLCVError("no se encontró columna de tiempo (timestamp/date/...) ni DatetimeIndex")
 
     if df.index.isna().any():
         raise OHLCVError("hay timestamps no parseables (NaT) tras la conversión")

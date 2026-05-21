@@ -48,13 +48,13 @@ class SleeveEvidence:
     """Evidencia bayesiana de un sleeve dentro de una corrida de BMA."""
 
     sleeve_id: str
-    weight: float          # peso posterior, en [0, 1]; Σ sobre la corrida = 1
-    prior: float           # prior usado, en [0, 1]
-    log_evidence: float    # log Bayes-factor (skill vs no-skill)
-    post_mean: float       # media posterior del retorno por barra (encogida a 0)
-    post_z: float          # z-score posterior de skill
-    sharpe: float          # Sharpe muestral OOS de la serie
-    n_obs: int             # nº de retornos OOS usados
+    weight: float  # peso posterior, en [0, 1]; Σ sobre la corrida = 1
+    prior: float  # prior usado, en [0, 1]
+    log_evidence: float  # log Bayes-factor (skill vs no-skill)
+    post_mean: float  # media posterior del retorno por barra (encogida a 0)
+    post_z: float  # z-score posterior de skill
+    sharpe: float  # Sharpe muestral OOS de la serie
+    n_obs: int  # nº de retornos OOS usados
 
 
 @dataclass(frozen=True)
@@ -211,8 +211,18 @@ def persist_weights(
         """,
         [
             (
-                ts_iso, ts_ms, result.run_id, e.sleeve_id, e.weight, e.prior,
-                e.log_evidence, e.post_mean, e.post_z, e.sharpe, e.n_obs, audit_id,
+                ts_iso,
+                ts_ms,
+                result.run_id,
+                e.sleeve_id,
+                e.weight,
+                e.prior,
+                e.log_evidence,
+                e.post_mean,
+                e.post_z,
+                e.sharpe,
+                e.n_obs,
+                audit_id,
             )
             for e in result.evidence
         ],

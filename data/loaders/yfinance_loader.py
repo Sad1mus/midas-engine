@@ -41,8 +41,13 @@ def _download(symbol: str, start: str | None, end: str | None, interval: str) ->
     import yfinance as yf
 
     raw = yf.download(
-        symbol, start=start, end=end, interval=interval,
-        auto_adjust=True, progress=False, multi_level_index=False,
+        symbol,
+        start=start,
+        end=end,
+        interval=interval,
+        auto_adjust=True,
+        progress=False,
+        multi_level_index=False,
     )
     if raw is None or raw.empty:
         raise RuntimeError(f"yfinance no devolvió datos para {symbol} ({interval})")
@@ -103,8 +108,12 @@ def main() -> int:
     args = parser.parse_args()
 
     df = fetch_ohlcv(
-        args.symbol, start=args.start, end=args.end, interval=args.interval,
-        refresh=True, cache_dir=args.cache_dir,
+        args.symbol,
+        start=args.start,
+        end=args.end,
+        interval=args.interval,
+        refresh=True,
+        cache_dir=args.cache_dir,
     )
     instrument = PROXY_TO_INSTRUMENT.get(args.symbol, "?")
     print(

@@ -85,8 +85,6 @@ def test_mind_is_portable(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> No
 
     # 5. The decision reappeared — recovered from text alone.
     conn = sqlite3.connect(db_path)
-    row = conn.execute(
-        "SELECT title, status, owner FROM decisions WHERE id = 'DEC-001'"
-    ).fetchone()
+    row = conn.execute("SELECT title, status, owner FROM decisions WHERE id = 'DEC-001'").fetchone()
     conn.close()
     assert row == ("Portable mind test", "proposed", "tester")

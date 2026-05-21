@@ -77,10 +77,7 @@ def _populate(db: Path) -> None:
 
 
 def _snapshot_tree(root: Path) -> dict[str, bytes]:
-    return {
-        str(p.relative_to(root)): p.read_bytes()
-        for p in sorted(root.rglob("*.md"))
-    }
+    return {str(p.relative_to(root)): p.read_bytes() for p in sorted(root.rglob("*.md"))}
 
 
 def test_project_all_writes_parseable_yaml(tmp_db: Path, tmp_path: Path) -> None:
@@ -156,7 +153,9 @@ def test_connection_is_read_only(tmp_db: Path) -> None:
     conn = projector._connect_ro(tmp_db)
     try:
         with pytest.raises(sqlite3.OperationalError):
-            conn.execute("INSERT INTO sleeves (id, name, track, status, asset_class, "
-                         "instruments, created_utc) VALUES ('x','x','B','paper','futures','[]','t')")
+            conn.execute(
+                "INSERT INTO sleeves (id, name, track, status, asset_class, "
+                "instruments, created_utc) VALUES ('x','x','B','paper','futures','[]','t')"
+            )
     finally:
         conn.close()

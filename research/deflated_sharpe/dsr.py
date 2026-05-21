@@ -29,7 +29,9 @@ def probabilistic_sharpe_ratio(
     """PSR: P(SR_verdadero > benchmark_sr) dado el SR observado y los momentos."""
     if n_obs < 2:
         return 0.0
-    denom = np.sqrt(max(1e-12, 1.0 - gamma3 * observed_sr + ((gamma4 - 1.0) / 4.0) * observed_sr**2))
+    denom = np.sqrt(
+        max(1e-12, 1.0 - gamma3 * observed_sr + ((gamma4 - 1.0) / 4.0) * observed_sr**2)
+    )
     z = (observed_sr - benchmark_sr) * np.sqrt(n_obs - 1) / denom
     return float(norm.cdf(z))
 

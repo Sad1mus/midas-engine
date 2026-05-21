@@ -30,8 +30,9 @@ def _populate_e2e(db: Path, tmp_path: Path) -> None:
     SleeveRunner(db_path=db, chain_path=chain_path, warmup=100, step=25).run(
         df, kill_switch=KillSwitch(db_path=tmp_path / "kill.db")
     )
-    validate_sleeve(df, db_path=db, sleeve_id="futures_tda_v1",
-                    chain_path=chain_path, verbose=False)
+    validate_sleeve(
+        df, db_path=db, sleeve_id="futures_tda_v1", chain_path=chain_path, verbose=False
+    )
 
 
 def test_entity_notes_have_typed_frontmatter(tmp_db: Path, tmp_path: Path) -> None:

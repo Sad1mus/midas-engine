@@ -26,7 +26,9 @@ def _robust_matrix(t_obs: int = 1000, n_configs: int = 20, seed: int = 0) -> np.
     return m
 
 
-def _overfit_matrix(t_obs: int = 1000, n_configs: int = 20, d: float = 0.004, seed: int = 0) -> np.ndarray:
+def _overfit_matrix(
+    t_obs: int = 1000, n_configs: int = 20, d: float = 0.004, seed: int = 0
+) -> np.ndarray:
     """Edge in-sample que se invierte out-of-sample (ganador IS = perdedor OOS)."""
     rng = np.random.default_rng(seed)
     mid = t_obs // 2

@@ -28,8 +28,12 @@ def test_runner_on_real_gld_bars(tmp_db: Path, tmp_path: Path) -> None:
 
     chain_path = tmp_path / "chain.ndjson"
     runner = SleeveRunner(
-        db_path=tmp_db, chain_path=chain_path, sleeve_id="gld_gc_real",
-        instrument=instrument, warmup=60, step=15,
+        db_path=tmp_db,
+        chain_path=chain_path,
+        sleeve_id="gld_gc_real",
+        instrument=instrument,
+        warmup=60,
+        step=15,
     )
     result = runner.run(df, kill_switch=KillSwitch(db_path=tmp_path / "kill.db"))
 

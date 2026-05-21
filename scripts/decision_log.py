@@ -116,9 +116,7 @@ def append_audit(
     payload_json = json.dumps(payload, sort_keys=True, separators=(",", ":"))
     payload_hash = sha256_hex(payload_json)
 
-    last = conn.execute(
-        "SELECT chain_hash FROM audit_log ORDER BY id DESC LIMIT 1"
-    ).fetchone()
+    last = conn.execute("SELECT chain_hash FROM audit_log ORDER BY id DESC LIMIT 1").fetchone()
     prev_hash = last[0] if last else ZERO_HASH
     new_chain_hash = chain_step(prev_hash, payload_hash)
 

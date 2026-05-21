@@ -36,7 +36,7 @@ INSTRUMENT_SPECS: dict[str, tuple[float, float]] = {
 DEFAULT_SPEC = (0.25, 1.0)
 
 # Coeficientes de impacto (calibración v1): impacto ∝ vol_dólar / liquidez.
-ETA_COEF = 0.10   # impacto temporal
+ETA_COEF = 0.10  # impacto temporal
 GAMMA_COEF = 0.10  # impacto permanente
 
 
@@ -69,7 +69,9 @@ def _calibrate_block(
     block: pd.DataFrame, instrument: str, hour: int, tick_size: float, tick_value: float
 ) -> CostCalibration:
     close = block["close"].to_numpy(dtype=float)
-    rng_ticks = (block["high"].to_numpy(dtype=float) - block["low"].to_numpy(dtype=float)) / tick_size
+    rng_ticks = (
+        block["high"].to_numpy(dtype=float) - block["low"].to_numpy(dtype=float)
+    ) / tick_size
     # spread proxy: ~10% del rango de la barra (acotado a >= 1 tick)
     spread_ticks = np.maximum(1.0, 0.10 * rng_ticks)
     returns = np.diff(np.log(close)) if close.size > 1 else np.array([0.0])
@@ -126,9 +128,16 @@ def calibrate_instrument(
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
-                    ts_iso, ts_ms, instrument, cal.hour_utc, cal.spread_ticks_mean,
-                    cal.spread_ticks_p95, cal.impact_eta, cal.impact_gamma,
-                    cal.slippage_var, cal.n_samples,
+                    ts_iso,
+                    ts_ms,
+                    instrument,
+                    cal.hour_utc,
+                    cal.spread_ticks_mean,
+                    cal.spread_ticks_p95,
+                    cal.impact_eta,
+                    cal.impact_gamma,
+                    cal.slippage_var,
+                    cal.n_samples,
                 ),
             )
         conn.commit()
@@ -157,9 +166,15 @@ def load_calibration(db_path: Path, instrument: str, hour_utc: int) -> CostCalib
     if row is None:
         return None
     return CostCalibration(
-        instrument=instrument, hour_utc=hour_utc,
-        spread_ticks_mean=row[0], spread_ticks_p95=row[1], impact_eta=row[2],
-        impact_gamma=row[3], slippage_var=row[4], n_samples=row[5], tick_value=tick_value,
+        instrument=instrument,
+        hour_utc=hour_utc,
+        spread_ticks_mean=row[0],
+        spread_ticks_p95=row[1],
+        impact_eta=row[2],
+        impact_gamma=row[3],
+        slippage_var=row[4],
+        n_samples=row[5],
+        tick_value=tick_value,
     )
 
 
@@ -179,9 +194,7 @@ def estimate_cost(
             raise ValueError("se requiere calibration, o db_path + order.hour_utc")
         calibration = load_calibration(db_path, order.instrument, order.hour_utc)
         if calibration is None:
-            raise ValueError(
-                f"sin calibración para {order.instrument} hora {order.hour_utc}"
-            )
+            raise ValueError(f"sin calibración para {order.instrument} hora {order.hour_utc}")
 
     size = abs(int(order.size))
     spread_cost = 0.5 * calibration.spread_ticks_mean * calibration.tick_value * size

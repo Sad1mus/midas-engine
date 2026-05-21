@@ -33,8 +33,12 @@ def _counts(db: Path) -> dict[str, int]:
     finally:
         conn.close()
     return {
-        "trades": trades, "filled": filled, "vetoed": vetoed,
-        "execs": execs, "equity": equity, "orphan": orphan,
+        "trades": trades,
+        "filled": filled,
+        "vetoed": vetoed,
+        "execs": execs,
+        "equity": equity,
+        "orphan": orphan,
     }
 
 

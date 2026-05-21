@@ -48,8 +48,7 @@ def test_load_csv_normalizes_schema(tmp_path: Path) -> None:
 def test_corrupt_high_below_low_raises(tmp_path: Path) -> None:
     csv = tmp_path / "bad.csv"
     csv.write_text(
-        "timestamp,open,high,low,close,volume\n"
-        "2026-01-01,10,8,9,10,100\n",  # high(8) < low(9)
+        "timestamp,open,high,low,close,volume\n2026-01-01,10,8,9,10,100\n",  # high(8) < low(9)
         encoding="utf-8",
     )
     with pytest.raises(OHLCVError, match="high < low"):
@@ -112,8 +111,13 @@ def test_synthetic_regime_shift_increases_volatility() -> None:
 def test_normalize_accepts_existing_datetime_index() -> None:
     idx = pd.date_range("2026-01-01", periods=3, freq="1min")  # naive
     raw = pd.DataFrame(
-        {"open": [1, 2, 3], "high": [2, 3, 4], "low": [0.5, 1.5, 2.5],
-         "close": [1.5, 2.5, 3.5], "volume": [10, 20, 30]},
+        {
+            "open": [1, 2, 3],
+            "high": [2, 3, 4],
+            "low": [0.5, 1.5, 2.5],
+            "close": [1.5, 2.5, 3.5],
+            "volume": [10, 20, 30],
+        },
         index=idx,
     )
     df = normalize_ohlcv(raw)

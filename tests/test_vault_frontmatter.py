@@ -37,9 +37,7 @@ def test_adr_has_valid_frontmatter(path: Path) -> None:
     missing = REQUIRED_KEYS - set(meta.keys())
     assert not missing, f"{path.name} missing keys: {sorted(missing)}"
 
-    assert meta["status"] in VALID_STATUSES, (
-        f"{path.name} invalid status: {meta['status']!r}"
-    )
+    assert meta["status"] in VALID_STATUSES, f"{path.name} invalid status: {meta['status']!r}"
 
     # ID must match filename
     expected_id = path.name.split("_", 1)[0]

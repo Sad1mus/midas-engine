@@ -40,9 +40,18 @@ def test_run_cockpit_reconstructs_from_chain(tmp_path: Path) -> None:
 
     chain_path = tmp_path / "chain.ndjson"
     chain.append_event(
-        actor="human:test", event_type="decision", event_key="DEC-999",
-        payload={"action": "create", "id": "DEC-999", "title": "T", "owner": "t",
-                 "status": "proposed", "vault_path": "x.md", "content_hash": "a" * 64},
+        actor="human:test",
+        event_type="decision",
+        event_key="DEC-999",
+        payload={
+            "action": "create",
+            "id": "DEC-999",
+            "title": "T",
+            "owner": "t",
+            "status": "proposed",
+            "vault_path": "x.md",
+            "content_hash": "a" * 64,
+        },
         chain_path=chain_path,
     )
     db = tmp_path / "midas.db"

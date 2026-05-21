@@ -147,7 +147,9 @@ def test_magister_freeze_nq_around_fomc(tmp_path: Path) -> None:
     assert recovered[0].action == "veto"
     assert recovered[0].instrument == "NQ"
     # y sigue vetando tras la reconstrucción
-    again = manager.evaluate(in_window, _healthy_state(), kill_switch=kill, ontology_rules=recovered)
+    again = manager.evaluate(
+        in_window, _healthy_state(), kill_switch=kill, ontology_rules=recovered
+    )
     assert again.verdict == RiskVerdict.REJECT
 
 

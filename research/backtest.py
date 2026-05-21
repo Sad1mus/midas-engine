@@ -38,7 +38,11 @@ def _git_commit() -> str:
     try:
         out = subprocess.run(
             ["git", "rev-parse", "--short", "HEAD"],
-            capture_output=True, text=True, timeout=2, cwd=REPO_ROOT, check=False,
+            capture_output=True,
+            text=True,
+            timeout=2,
+            cwd=REPO_ROOT,
+            check=False,
         )
         if out.returncode == 0 and out.stdout.strip():
             return out.stdout.strip()
@@ -88,8 +92,11 @@ def run_validation(
     path_sharpes = [
         sharpe_ratio(cand_returns[split.test_idx])
         for split in cpcv_split(
-            t_obs, n_groups=n_groups, k_test=k_test,
-            embargo_pct=embargo_pct, purge_pct=purge_pct,
+            t_obs,
+            n_groups=n_groups,
+            k_test=k_test,
+            embargo_pct=embargo_pct,
+            purge_pct=purge_pct,
         )
     ]
     paths = n_paths(n_groups, k_test)
@@ -142,9 +149,21 @@ def run_validation(
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
-                sleeve_id, commit, ts_iso, ts_ms, paths, sharpe_mean, sharpe_std,
-                dsr, pbo_res.pbo, max_dd, calmar, embargo_pct, purge_pct,
-                json.dumps(cfg, sort_keys=True), audit_id,
+                sleeve_id,
+                commit,
+                ts_iso,
+                ts_ms,
+                paths,
+                sharpe_mean,
+                sharpe_std,
+                dsr,
+                pbo_res.pbo,
+                max_dd,
+                calmar,
+                embargo_pct,
+                purge_pct,
+                json.dumps(cfg, sort_keys=True),
+                audit_id,
             ),
         )
         conn.commit()

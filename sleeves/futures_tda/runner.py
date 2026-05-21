@@ -88,8 +88,13 @@ class SleeveRunner:
                 (id, name, track, status, asset_class, instruments, created_utc)
             VALUES (?, ?, ?, 'paper', 'futures', ?, ?)
             """,
-            (self.sleeve_id, f"TDA {self.instrument}", self.track,
-             json.dumps([self.instrument]), now),
+            (
+                self.sleeve_id,
+                f"TDA {self.instrument}",
+                self.track,
+                json.dumps([self.instrument]),
+                now,
+            ),
         )
         conn.commit()
 
@@ -172,11 +177,17 @@ class SleeveRunner:
             (
                 ts.isoformat(timespec="milliseconds").replace("+00:00", "Z"),
                 int(ts.timestamp() * 1000),
-                self.sleeve_id, self.track, round(equity, 2), round(peak, 2), round(dd, 6),
+                self.sleeve_id,
+                self.track,
+                round(equity, 2),
+                round(peak, 2),
+                round(dd, 6),
             ),
         )
 
-    def _write_regime(self, conn: sqlite3.Connection, ts: dt.datetime, label: str, dtopo: float) -> int:
+    def _write_regime(
+        self, conn: sqlite3.Connection, ts: dt.datetime, label: str, dtopo: float
+    ) -> int:
         cur = conn.execute(
             """
             INSERT OR IGNORE INTO regime_states
@@ -185,8 +196,11 @@ class SleeveRunner:
             """,
             (
                 ts.isoformat(timespec="milliseconds").replace("+00:00", "Z"),
-                int(ts.timestamp() * 1000), CLASSIFIER, label,
-                json.dumps({"label": label}), json.dumps({"d_topo": round(dtopo, 6)}),
+                int(ts.timestamp() * 1000),
+                CLASSIFIER,
+                label,
+                json.dumps({"label": label}),
+                json.dumps({"d_topo": round(dtopo, 6)}),
             ),
         )
         return int(cur.lastrowid or 0)
@@ -242,8 +256,11 @@ class SleeveRunner:
 
                 # 3. DD-gate desde equity_curve
                 gate = evaluate_gate(
-                    conn, sleeve_id=self.sleeve_id, track=self.track,
-                    ts=ts, chain_path=self.chain_path,
+                    conn,
+                    sleeve_id=self.sleeve_id,
+                    track=self.track,
+                    ts=ts,
+                    chain_path=self.chain_path,
                 )
 
                 # 4. régimen (Variable 𝒳) + señal
@@ -257,24 +274,34 @@ class SleeveRunner:
                 # 5. RISK MANAGER — ninguna orden lo evita
                 state = self._account_state(equity, trades_today, daily_pnl)
                 decision = manager.evaluate(
-                    signal, state, kill_switch=kill_switch,
-                    ontology_rules=ontology_rules, gate=gate,
+                    signal,
+                    state,
+                    kill_switch=kill_switch,
+                    ontology_rules=ontology_rules,
+                    gate=gate,
                 )
 
                 trade_id = uuid.uuid4().hex
                 sign = 1 if signal.direction == Direction.LONG else -1
                 side = "long" if sign == 1 else "short"
                 approved = decision.verdict in (
-                    RiskVerdict.APPROVE, RiskVerdict.APPROVE_PENDING_HUMAN
+                    RiskVerdict.APPROVE,
+                    RiskVerdict.APPROVE_PENDING_HUMAN,
                 )
                 status = "filled" if approved and decision.approved_size_contracts > 0 else "vetoed"
                 statuses[status] = statuses.get(status, 0) + 1
 
-                audit_id = self._audit_trade(conn, {
-                    "trade_id": trade_id, "verdict": decision.verdict, "status": status,
-                    "instrument": self.instrument, "side": side,
-                    "size": decision.approved_size_contracts,
-                })
+                audit_id = self._audit_trade(
+                    conn,
+                    {
+                        "trade_id": trade_id,
+                        "verdict": decision.verdict,
+                        "status": status,
+                        "instrument": self.instrument,
+                        "side": side,
+                        "size": decision.approved_size_contracts,
+                    },
+                )
                 conn.execute(
                     """
                     INSERT INTO trades
@@ -284,19 +311,32 @@ class SleeveRunner:
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """,
                     (
-                        trade_id, self.sleeve_id, self.track,
+                        trade_id,
+                        self.sleeve_id,
+                        self.track,
                         ts.isoformat(timespec="milliseconds").replace("+00:00", "Z"),
-                        int(ts.timestamp() * 1000), self.instrument, side,
-                        float(decision.approved_size_contracts), float(signal.entry_price),
-                        float(signal.stop_loss), float(signal.take_profit_1), regime_id,
-                        status, None if approved else " | ".join(decision.reasons)[:300], audit_id,
+                        int(ts.timestamp() * 1000),
+                        self.instrument,
+                        side,
+                        float(decision.approved_size_contracts),
+                        float(signal.entry_price),
+                        float(signal.stop_loss),
+                        float(signal.take_profit_1),
+                        regime_id,
+                        status,
+                        None if approved else " | ".join(decision.reasons)[:300],
+                        audit_id,
                     ),
                 )
 
                 if status == "filled":
                     size = decision.approved_size_contracts
                     cal = calibrations.get(ts.hour)
-                    cost = estimate_cost(CostOrder(self.instrument, size), calibration=cal) if cal else 0.0
+                    cost = (
+                        estimate_cost(CostOrder(self.instrument, size), calibration=cal)
+                        if cal
+                        else 0.0
+                    )
                     fill_price = float(signal.entry_price) + sign * SLIPPAGE_TICKS * self.tick_size
                     conn.execute(
                         """
@@ -306,16 +346,27 @@ class SleeveRunner:
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                         """,
                         (
-                            uuid.uuid4().hex, trade_id,
+                            uuid.uuid4().hex,
+                            trade_id,
                             ts.isoformat(timespec="milliseconds").replace("+00:00", "Z"),
-                            int(ts.timestamp() * 1000), self.instrument, side, float(size),
-                            fill_price, round(cost, 4), 0.0, SLIPPAGE_TICKS, "paper_b", audit_id,
+                            int(ts.timestamp() * 1000),
+                            self.instrument,
+                            side,
+                            float(size),
+                            fill_price,
+                            round(cost, 4),
+                            0.0,
+                            SLIPPAGE_TICKS,
+                            "paper_b",
+                            audit_id,
                         ),
                     )
                     n_exec += 1
                     trades_today += 1
                     position = {
-                        "entry": fill_price, "size": size, "sign": sign,
+                        "entry": fill_price,
+                        "size": size,
+                        "sign": sign,
                         "round_trip_cost": 2.0 * cost,
                     }
                 else:

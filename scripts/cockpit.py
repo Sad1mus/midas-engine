@@ -56,13 +56,15 @@ def main() -> int:
     parser.add_argument("--vault", type=Path, default=settings.obsidian_vault_path)
     parser.add_argument("--chain-file", type=Path, default=chain.DEFAULT_CHAIN)
     parser.add_argument(
-        "--no-reconstruct", action="store_true",
+        "--no-reconstruct",
+        action="store_true",
         help="proyectar el .db tal cual (sin replay del chain)",
     )
     args = parser.parse_args()
 
     summary = run_cockpit(
-        args.db, args.vault,
+        args.db,
+        args.vault,
         chain_path=args.chain_file,
         reconstruct=not args.no_reconstruct,
     )

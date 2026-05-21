@@ -48,7 +48,9 @@ def _load_bars(symbol: str, interval: str, start: str, refresh: bool) -> tuple[p
         raise
 
 
-def _summary(db_path: Path, sleeve_id: str, r: RunResult, bars: int, instrument: str, src: str) -> None:
+def _summary(
+    db_path: Path, sleeve_id: str, r: RunResult, bars: int, instrument: str, src: str
+) -> None:
     conn = sqlite3.connect(db_path)
     try:
         dd = conn.execute(
@@ -60,14 +62,25 @@ def _summary(db_path: Path, sleeve_id: str, r: RunResult, bars: int, instrument:
     finally:
         conn.close()
     print(f"── {sleeve_id}  (proxy→{instrument}, fuente={src}) ──")
-    print(f"   barras={bars}  decisiones={r.n_decisions}  filled={r.n_executions}  vetoed={r.n_vetoed}")
+    print(
+        f"   barras={bars}  decisiones={r.n_decisions}  filled={r.n_executions}  vetoed={r.n_vetoed}"
+    )
     print(f"   equity: {r.starting_equity:.0f} → {r.final_equity:.2f}")
-    print(f"   max drawdown: {(dd or 0.0):.4f}   gate: {gate[0] if gate else 'normal'} (×{gate[1] if gate else 1.0})")
+    print(
+        f"   max drawdown: {(dd or 0.0):.4f}   gate: {gate[0] if gate else 'normal'} (×{gate[1] if gate else 1.0})"
+    )
 
 
 def run(
-    *, db_path: Path, chain_path: Path, symbols: tuple[str, ...],
-    interval: str, start: str, refresh: bool, warmup: int, step: int,
+    *,
+    db_path: Path,
+    chain_path: Path,
+    symbols: tuple[str, ...],
+    interval: str,
+    start: str,
+    refresh: bool,
+    warmup: int,
+    step: int,
 ) -> int:
     print(f"reconstruyendo .db de producción desde el chain → {db_path}")
     init_db(db_path, chain_path=chain_path)
@@ -82,8 +95,12 @@ def run(
         df, src = _load_bars(symbol, interval, start, refresh)
         sleeve_id = f"{symbol.lower()}_{instrument.lower()}_real"
         runner = SleeveRunner(
-            db_path=db_path, chain_path=chain_path, sleeve_id=sleeve_id,
-            instrument=instrument, warmup=warmup, step=step,
+            db_path=db_path,
+            chain_path=chain_path,
+            sleeve_id=sleeve_id,
+            instrument=instrument,
+            warmup=warmup,
+            step=step,
         )
         result = runner.run(df, kill_switch=ks)
         _summary(db_path, sleeve_id, result, len(df), instrument, src)
@@ -104,10 +121,14 @@ def main() -> int:
     args = parser.parse_args()
 
     return run(
-        db_path=args.db, chain_path=args.chain_file,
+        db_path=args.db,
+        chain_path=args.chain_file,
         symbols=tuple(s.strip().upper() for s in args.symbols.split(",") if s.strip()),
-        interval=args.interval, start=args.start, refresh=args.refresh,
-        warmup=args.warmup, step=args.step,
+        interval=args.interval,
+        start=args.start,
+        refresh=args.refresh,
+        warmup=args.warmup,
+        step=args.step,
     )
 
 

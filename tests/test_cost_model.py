@@ -36,7 +36,7 @@ def test_calibration_writes_coherent_params(tmp_db: Path) -> None:
     for instrument, hour, spread, eta, gamma, n in rows:
         assert instrument == "NQ"
         assert 0 <= hour < 24
-        assert spread >= 1.0          # al menos un tick
+        assert spread >= 1.0  # al menos un tick
         assert eta > 0 and gamma > 0  # impactos positivos
         assert n > 0
 

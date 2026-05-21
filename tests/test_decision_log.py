@@ -111,9 +111,7 @@ def test_append_audit_chains_correctly(db_connection: sqlite3.Connection) -> Non
     id2 = decision_log.append_audit(
         db_connection, actor="b", event_type="e2", event_key=None, payload={"i": 2}
     )
-    row1 = db_connection.execute(
-        "SELECT chain_hash FROM audit_log WHERE id = ?", (id1,)
-    ).fetchone()
+    row1 = db_connection.execute("SELECT chain_hash FROM audit_log WHERE id = ?", (id1,)).fetchone()
     row2 = db_connection.execute(
         "SELECT prev_hash, payload_hash, chain_hash FROM audit_log WHERE id = ?", (id2,)
     ).fetchone()
@@ -222,9 +220,7 @@ def test_verify_chain_detects_prev_hash_tampering(
         db_connection, actor="b", event_type="e2", event_key=None, payload={"i": 2}
     )
     # Tamper with prev_hash of row 2
-    db_connection.execute(
-        "UPDATE audit_log SET prev_hash = ? WHERE id = 2", ("f" * 64,)
-    )
+    db_connection.execute("UPDATE audit_log SET prev_hash = ? WHERE id = 2", ("f" * 64,))
     db_connection.commit()
     db_connection.close()
 

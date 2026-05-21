@@ -210,9 +210,7 @@ def _seed_audit_row(conn: sqlite3.Connection) -> None:
 
 def test_ontology_rules_table_present_at_v2(db_connection: sqlite3.Connection) -> None:
     assert "ontology_rules" in _all_tables(db_connection)
-    version = db_connection.execute(
-        "SELECT version FROM schema_version WHERE id = 1"
-    ).fetchone()[0]
+    version = db_connection.execute("SELECT version FROM schema_version WHERE id = 1").fetchone()[0]
     assert version >= 2, f"ontology_rules ships from schema v2 onward, got {version}"
 
 
@@ -243,9 +241,7 @@ def test_ontology_rules_accepts_valid_restrictive_actions(
                     1,
                 ),
             )
-    rows = db_connection.execute(
-        "SELECT action FROM ontology_rules ORDER BY ts_ms"
-    ).fetchall()
+    rows = db_connection.execute("SELECT action FROM ontology_rules ORDER BY ts_ms").fetchall()
     assert [r[0] for r in rows] == ["veto", "size_down"]
 
 

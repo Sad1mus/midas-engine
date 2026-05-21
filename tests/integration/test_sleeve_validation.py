@@ -65,8 +65,11 @@ def test_overfit_sleeve_gets_nogo(tmp_db: Path, tmp_path: Path) -> None:
     """El sleeve v1 sobre datos sintéticos NO generaliza → el pipeline lo frena (NO-GO)."""
     df = synthetic_ohlcv(800, seed=3, drift=0.0008, freq="1min")
     verdict = validate_sleeve(
-        df, db_path=tmp_db, sleeve_id="trend_sleeve",
-        chain_path=tmp_path / "chain.ndjson", verbose=False,
+        df,
+        db_path=tmp_db,
+        sleeve_id="trend_sleeve",
+        chain_path=tmp_path / "chain.ndjson",
+        verbose=False,
     )
     # PBO alto ⇒ la selección de lookback no generaliza ⇒ NO-GO (el pipeline protege)
     assert verdict.verdict == "NO-GO"
