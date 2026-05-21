@@ -1,0 +1,102 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+.python-version.local
+
+# Testing & coverage
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+.mypy_cache/
+.ruff_cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Rust
+target/
+Cargo.lock
+**/*.rs.bk
+
+# uv lockfile (commit it later when stable)
+# uv.lock — uncomment to ignore during early dev
+
+# Data — never commit market data or fills
+.midas/
+data/cache/
+data/raw/
+*.parquet
+*.feather
+*.h5
+
+# SQLite local databases (schema in infra/sqlite/, never the .db file)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Secrets — NEVER commit
+.env
+.env.*
+!.env.example
+secrets/
+credentials/
+*.pem
+*.key
+
+# Obsidian state (commit content, not local workspace state)
+vault/.obsidian/workspace*
+vault/.obsidian/cache/
+vault/.trash/
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts from maturin (Rust→Python)
+*.dylib
+*.dll
+target/

@@ -1,0 +1,12 @@
+-- =====================================================================
+-- MIDAS Capital — SQLite Schema entry point
+-- =====================================================================
+-- This file is intentionally minimal. The actual schema is defined in
+-- migrations/NNN_*.sql which are applied in order by scripts/init_db.py.
+--
+-- Never edit migrations in-place after they have been applied. Add a new
+-- migration file instead. The schema_version table tracks current version.
+--
+-- To initialize a fresh database:
+--     python scripts/init_db.py [--db path/to/midas.db]
+-- =====================================================================

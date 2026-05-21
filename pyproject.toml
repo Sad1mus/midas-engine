@@ -1,0 +1,145 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "midas"
+version = "0.0.1"
+description = "MIDAS — automated quantitative fund (Zenithstone Holding)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = { text = "Proprietary" }
+authors = [{ name = "Zenithstone Holding" }]
+
+# Fase 1 stack — no añadir dependencias sin DEC nuevo.
+dependencies = [
+    # Numerical core
+    "numpy>=2.0,<3",
+    "pandas>=2.2,<3",
+    "scipy>=1.13,<2",
+    "scikit-learn>=1.5,<2",
+
+    # TDA — Variable X
+    "ripser>=0.6,<1",
+    "persim>=0.3,<1",
+
+    # MCP & LLMs
+    "fastmcp>=2.0,<3",
+    "httpx>=0.27,<1",
+    "anthropic>=0.40,<1",        # compatible con OpenRouter via base_url
+
+    # Storage & I/O
+    "aiosqlite>=0.20,<1",
+    "pyyaml>=6.0,<7",
+    "watchfiles>=0.24,<1",       # Obsidian sync trigger
+
+    # Datos de mercado (ETF proxies GLD/QQQ) — aprobado por DEC-012. Única dep nueva del round.
+    "yfinance>=0.2,<1",
+
+    # Validation & schemas
+    "pydantic>=2.9,<3",
+
+    # Logging
+    "structlog>=24.4,<25",
+
+    # CLI
+    "click>=8.1,<9",
+
+    # Async
+    "uvloop>=0.20,<1; sys_platform != 'win32'",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3,<9",
+    "pytest-asyncio>=0.24,<1",
+    "pytest-cov>=5.0,<6",
+    "ruff>=0.6,<1",
+    "mypy>=1.11,<2",
+    "pre-commit>=4.0,<5",
+    "maturin>=1.7,<2",           # para extensiones Rust (Veto en PyO3)
+    "types-PyYAML>=6.0",
+]
+
+ipykernel = [
+    "jupyterlab>=4.2,<5",
+    "ipykernel>=6.29,<7",
+    "matplotlib>=3.9,<4",
+    "seaborn>=0.13,<1",
+]
+
+[project.scripts]
+midas-init-db = "scripts.init_db:main"
+midas-decision = "scripts.decision_log:main"
+midas-verify-chain = "scripts.verify_chain:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["core", "agents", "sleeves", "research", "data", "infra"]
+
+# ─────────────────────────────────────────────────────────────────
+# Ruff — linter + formatter
+# ─────────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "I",        # isort
+    "UP",       # pyupgrade
+    "B",        # flake8-bugbear
+    "SIM",      # flake8-simplify
+    "ASYNC",    # flake8-async
+    "RUF",      # ruff-specific
+]
+ignore = [
+    "E501",     # line too long — handled by formatter
+]
+# Símbolos de nomenclatura del proyecto, no typos: 𝒳 (Variable 𝒳/TDA), × (matrices T×C),
+# γ/η (impacto permanente/temporal de Almgren-Chriss), σ/τ (volatilidad/escala del prior en BMA).
+allowed-confusables = ["𝒳", "×", "γ", "η", "σ", "τ"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+# ─────────────────────────────────────────────────────────────────
+# Mypy — strict-ish
+# ─────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unreachable = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+module = ["ripser.*", "persim.*", "fastmcp.*"]
+ignore_missing_imports = true
+
+# ─────────────────────────────────────────────────────────────────
+# Pytest
+# ─────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov=core",
+    "--cov=agents",
+    "--cov=sleeves",
+    "--cov=research",
+    "--cov=infra",
+    "--cov-report=term-missing",
+]
+asyncio_mode = "auto"
+markers = [
+    "slow: marks tests that take >5s",
+    "integration: marks integration tests",
+    "requires_network: marks tests requiring network",
+]
